@@ -330,6 +330,92 @@ section[id]{scroll-margin-top:92px}
   display:block;margin-bottom:10px;color:var(--ink);
 }
 
+/* ---------- calculator ---------- */
+
+.calc{padding:100px 0 96px;border-top:1.5px solid var(--ink)}
+
+.calc-grid{
+  display:grid;grid-template-columns:1.05fr .95fr;
+  gap:60px;align-items:start;
+}
+
+.calc-display{
+  border:1.5px solid var(--ink);
+  border-radius:12px;
+  background:var(--paper-tint);
+  padding:22px 24px 20px;
+  min-height:148px;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  margin-bottom:16px;
+}
+.calc-expr{
+  font-family:var(--display);font-weight:500;font-size:19px;
+  color:var(--muted);min-height:29px;
+  font-variant-numeric:tabular-nums;
+  overflow-wrap:anywhere;
+}
+.calc-result{
+  font-family:var(--display);font-weight:800;
+  font-size:clamp(38px,6vw,58px);
+  letter-spacing:-.045em;line-height:1.06;
+  color:var(--blue);
+  font-variant-numeric:tabular-nums;
+  overflow-wrap:anywhere;
+}
+.calc-result.err{color:var(--pink);font-size:23px;letter-spacing:-.01em;font-weight:700}
+
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+
+.key{
+  font-family:var(--display);font-weight:700;font-size:21px;
+  letter-spacing:-.02em;
+  padding:19px 0;
+  border:1.5px solid var(--ink);
+  border-radius:10px;
+  background:var(--paper);
+  color:var(--ink);
+  cursor:pointer;
+  transition:background .12s, color .12s, transform .07s;
+}
+.key:hover{background:var(--paper-tint)}
+.key:active,.key.held{transform:translateY(1px);background:var(--paper-tint)}
+.key.op{color:var(--blue)}
+.key.fn{color:var(--muted);font-size:19px}
+.key.clear{color:var(--pink)}
+.key.eq{background:var(--blue);color:var(--paper);border-color:var(--ink)}
+.key.eq:hover,.key.eq:active{background:var(--ink)}
+.key.wide{grid-column:span 2}
+
+.side-title{
+  font-family:var(--display);font-weight:700;font-size:19px;
+  letter-spacing:-.02em;margin-bottom:6px;
+}
+
+.calc-history{list-style:none;max-height:330px;overflow-y:auto}
+.calc-history li{
+  display:flex;justify-content:space-between;align-items:baseline;gap:16px;
+  padding:13px 6px;
+  border-bottom:1.5px solid var(--rule);
+  border-radius:6px;
+  cursor:pointer;
+}
+.calc-history li:hover{background:var(--paper-tint)}
+.calc-history .h-expr{
+  color:var(--muted);font-weight:300;font-size:16.5px;
+  overflow-wrap:anywhere;
+}
+.calc-history .h-val{
+  font-family:var(--display);font-weight:700;font-size:18px;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+  white-space:nowrap;
+}
+.calc-history .calc-empty{
+  display:block;cursor:default;color:var(--muted);
+  font-weight:300;font-size:16.5px;border-bottom-color:transparent;
+  padding-left:0;
+}
+.calc-history .calc-empty:hover{background:transparent}
+
 /* ---------- features ---------- */
 
 .features{padding:104px 0 96px;border-top:1.5px solid var(--ink)}
@@ -440,6 +526,9 @@ footer{
   .about-grid{grid-template-columns:1fr;gap:44px}
   .prayer-grid{grid-template-columns:1fr;gap:44px}
   .prayer{padding:76px 0}
+  .calc-grid{grid-template-columns:1fr;gap:40px}
+  .calc{padding:76px 0}
+  .key{padding:17px 0;font-size:20px}
   .section-head{flex-direction:column;align-items:start;gap:14px}
   .section-head p{text-align:left}
   .nav-links{display:none}
@@ -476,6 +565,7 @@ footer{
       <div class="nav-links">
         <a href="#home">Home</a>
         <a href="#prayer">Prayer times</a>
+        <a href="#calc">Calculator</a>
         <a href="#features">Features</a>
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
@@ -486,6 +576,7 @@ footer{
         <div class="menu-panel">
           <a href="#home">Home</a>
           <a href="#prayer">Prayer times</a>
+          <a href="#calc">Calculator</a>
           <a href="#features">Features</a>
           <a href="#about">About</a>
           <a href="#contact">Contact</a>
@@ -576,6 +667,65 @@ footer{
           Official times from the Ministry of Islamic Affairs, as published in
           the SalatMV dataset. The Hijri date follows the Umm al-Qura calendar
           and can differ by a day from the locally sighted date.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<section class="calc" id="calc">
+  <div class="container">
+
+    <div class="section-head">
+      <h2>Calculator</h2>
+      <p>Click the keys or just type — your keyboard drives it.</p>
+    </div>
+
+    <div class="calc-grid">
+
+      <div>
+        <div class="calc-display">
+          <div class="calc-expr" id="calcExpr">&nbsp;</div>
+          <output class="calc-result" id="calcOut" aria-live="polite">0</output>
+        </div>
+
+        <div class="keys" id="keys">
+          <button type="button" class="key clear" data-k="AC">AC</button>
+          <button type="button" class="key fn" data-k="back" aria-label="Backspace">&#9003;</button>
+          <button type="button" class="key fn" data-k="%">%</button>
+          <button type="button" class="key op" data-k="&divide;">&divide;</button>
+
+          <button type="button" class="key" data-k="7">7</button>
+          <button type="button" class="key" data-k="8">8</button>
+          <button type="button" class="key" data-k="9">9</button>
+          <button type="button" class="key op" data-k="&times;">&times;</button>
+
+          <button type="button" class="key" data-k="4">4</button>
+          <button type="button" class="key" data-k="5">5</button>
+          <button type="button" class="key" data-k="6">6</button>
+          <button type="button" class="key op" data-k="&minus;">&minus;</button>
+
+          <button type="button" class="key" data-k="1">1</button>
+          <button type="button" class="key" data-k="2">2</button>
+          <button type="button" class="key" data-k="3">3</button>
+          <button type="button" class="key op" data-k="+">+</button>
+
+          <button type="button" class="key wide" data-k="0">0</button>
+          <button type="button" class="key" data-k=".">.</button>
+          <button type="button" class="key eq" data-k="=">=</button>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="side-title">History</h3>
+        <ul class="calc-history" id="calcHistory">
+          <li class="calc-empty">Nothing yet. Results land here — tap one to reuse it.</li>
+        </ul>
+        <p class="prayer-note">
+          Percentages follow the usual convention: 200&minus;10% takes ten percent
+          off, while 10% on its own is 0.1.
         </p>
       </div>
 
@@ -1129,6 +1279,266 @@ footer{
 
   pick();
   setInterval(tick, 1000);
+})();
+</script>
+
+<script>
+(function () {
+  "use strict";
+
+  var MINUS = "\u2212", TIMES = "\u00d7", DIV = "\u00f7";
+  var OPS = "+" + MINUS + TIMES + DIV;
+
+  var exprEl = document.getElementById("calcExpr");
+  var outEl  = document.getElementById("calcOut");
+  var keys   = document.getElementById("keys");
+  var histEl = document.getElementById("calcHistory");
+  if (!keys) return;
+
+  var expr = "", fresh = true, lastValue = 0, history = [];
+  try { history = JSON.parse(localStorage.getItem("nova-calc") || "[]").slice(0, 20); }
+  catch (e) { history = []; }
+
+  /* ---- tokenizer + recursive descent parser, no eval ---------------- */
+
+  function tokens(s) {
+    var out = [], i = 0, j, c;
+    while (i < s.length) {
+      c = s[i];
+      if ((c >= "0" && c <= "9") || c === ".") {
+        j = i;
+        while (j < s.length && ((s[j] >= "0" && s[j] <= "9") || s[j] === ".")) j++;
+        out.push({ t: "n", v: parseFloat(s.slice(i, j)) });
+        i = j;
+      } else if (OPS.indexOf(c) >= 0 || c === "%") {
+        out.push({ t: c }); i++;
+      } else { i++; }
+    }
+    return out;
+  }
+
+  /* Percent behaves the way people expect from a phone calculator:
+     next to + or - it means "that percent of the left-hand side",
+     so 200-10% is 180. Anywhere else it just divides by a hundred. */
+  function parse(s) {
+    var tk = tokens(s), p = 0;
+
+    function primary() {
+      var t = tk[p];
+      if (!t || t.t !== "n" || isNaN(t.v)) throw 0;
+      p++;
+      var node = { v: t.v, pct: false };
+      while (tk[p] && tk[p].t === "%") { p++; node.pct = true; }
+      return node;
+    }
+    function unary() {
+      if (tk[p] && tk[p].t === MINUS) {
+        p++;
+        var r = unary();
+        return { v: -r.v, pct: r.pct };
+      }
+      return primary();
+    }
+    function term() {
+      var l = unary();
+      while (tk[p] && (tk[p].t === TIMES || tk[p].t === DIV)) {
+        var op = tk[p].t; p++;
+        var r = unary(), rv = r.pct ? r.v / 100 : r.v;
+        if (op === DIV && rv === 0) throw 1;
+        l = { v: op === TIMES ? l.v * rv : l.v / rv, pct: false };
+      }
+      return l;
+    }
+    function sum() {
+      var l = term();
+      while (tk[p] && (tk[p].t === "+" || tk[p].t === MINUS)) {
+        var op = tk[p].t; p++;
+        var r = term(), rv = r.pct ? l.v * r.v / 100 : r.v;
+        l = { v: op === "+" ? l.v + rv : l.v - rv, pct: false };
+      }
+      return l;
+    }
+
+    var res = sum();
+    if (p !== tk.length) throw 0;
+    return res.pct ? res.v / 100 : res.v;
+  }
+
+  function fmt(n) {
+    if (typeof n !== "number" || !isFinite(n)) return null;
+    if (Math.abs(n) < 1e-12) n = 0;
+    if (Math.abs(n) >= 1e15 || (n !== 0 && Math.abs(n) < 1e-9)) return n.toExponential(6);
+    return (Math.round(n * 1e10) / 1e10).toLocaleString("en-US", { maximumFractionDigits: 10 });
+  }
+
+  function trimOps(s) { return s.replace(/[+\u2212\u00d7\u00f7]+$/, ""); }
+
+  /* ---- display ------------------------------------------------------ */
+
+  function update() {
+    exprEl.textContent = expr || "\u00a0";
+    outEl.classList.remove("err");
+
+    if (!expr) { outEl.textContent = "0"; lastValue = 0; return; }
+    try {
+      var v = parse(trimOps(expr)), f = fmt(v);
+      if (f === null) throw 1;
+      lastValue = v;
+      outEl.textContent = f;
+    } catch (err) {
+      if (err === 1) {
+        outEl.textContent = "Can't divide by zero";
+        outEl.classList.add("err");
+      } else {
+        outEl.textContent = fmt(lastValue);
+      }
+    }
+  }
+
+  function renderHistory() {
+    histEl.innerHTML = "";
+    if (!history.length) {
+      var empty = document.createElement("li");
+      empty.className = "calc-empty";
+      empty.textContent = "Nothing yet. Results land here — tap one to reuse it.";
+      histEl.appendChild(empty);
+      return;
+    }
+    history.forEach(function (h, i) {
+      var li = document.createElement("li");
+      li.setAttribute("data-i", i);
+      li.setAttribute("title", "Use this result");
+
+      var a = document.createElement("span");
+      a.className = "h-expr";
+      a.textContent = h.e;
+
+      var b = document.createElement("span");
+      b.className = "h-val";
+      b.textContent = h.f;
+
+      li.appendChild(a);
+      li.appendChild(b);
+      histEl.appendChild(li);
+    });
+  }
+
+  function save() {
+    try { localStorage.setItem("nova-calc", JSON.stringify(history)); } catch (e) {}
+  }
+
+  /* ---- input -------------------------------------------------------- */
+
+  function numToExpr(v) {
+    var raw = String(Math.round(v * 1e10) / 1e10);
+    return /^-?[0-9]*\.?[0-9]+$/.test(raw) ? raw.replace("-", MINUS) : "";
+  }
+
+  function commit() {
+    var s = trimOps(expr);
+    if (!s) return;
+    try {
+      var v = parse(s), f = fmt(v);
+      if (f === null) throw 1;
+      history.unshift({ e: s, f: f, v: v });
+      history = history.slice(0, 20);
+      save();
+      renderHistory();
+      expr = numToExpr(v);
+      fresh = true;
+      update();
+    } catch (err) {
+      outEl.textContent = err === 1 ? "Can't divide by zero" : "That sum isn't finished";
+      outEl.classList.add("err");
+    }
+  }
+
+  function press(k) {
+    if (k === "AC")   { expr = ""; fresh = true; update(); return; }
+    if (k === "back") { expr = expr.slice(0, -1); update(); return; }
+    if (k === "=")    { commit(); return; }
+
+    if (fresh && ((k >= "0" && k <= "9") || k === ".")) expr = "";
+    fresh = false;
+
+    var last = expr.slice(-1);
+    var lastIsOp = last !== "" && OPS.indexOf(last) >= 0;
+
+    if (OPS.indexOf(k) >= 0) {
+      if (!expr && k !== MINUS) return;            // only a minus may lead
+      if (lastIsOp) expr = expr.slice(0, -1);      // swap one operator for another
+      if (last === ".") expr += "0";
+      expr += k;
+
+    } else if (k === ".") {
+      var seg = expr.split(/[+\u2212\u00d7\u00f7%]/).pop();
+      if (seg.indexOf(".") >= 0) return;
+      if (!seg) expr += "0";
+      expr += ".";
+
+    } else if (k === "%") {
+      if (!expr || lastIsOp || last === "%" || last === ".") return;
+      expr += "%";
+
+    } else {
+      if (last === "%") return;                    // no implicit multiply
+      expr += k;
+    }
+    update();
+  }
+
+  function hit(k) {
+    press(k);
+    var btn = keys.querySelector('[data-k="' + k + '"]');
+    if (btn) {
+      btn.classList.add("held");
+      setTimeout(function () { btn.classList.remove("held"); }, 90);
+    }
+  }
+
+  keys.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-k]");
+    if (btn) press(btn.getAttribute("data-k"));
+  });
+
+  histEl.addEventListener("click", function (e) {
+    var li = e.target.closest("li[data-i]");
+    if (!li) return;
+    var h = history[+li.getAttribute("data-i")];
+    if (!h) return;
+    expr = numToExpr(h.v);
+    fresh = true;
+    update();
+  });
+
+  /* keyboard, but only while the keypad is actually on screen, so typing
+     elsewhere on the page doesn't quietly feed the calculator */
+  function onScreen() {
+    var r = keys.getBoundingClientRect();
+    return r.top < window.innerHeight && r.bottom > 0;
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var tag = (document.activeElement || {}).tagName;
+    if (tag === "SELECT" || tag === "INPUT" || tag === "TEXTAREA") return;
+    if (!onScreen()) return;
+
+    var k = e.key;
+    var map = { "*": TIMES, "x": TIMES, "/": DIV, "-": MINUS };
+
+    if ((k >= "0" && k <= "9") || k === "." || k === "+" || k === "%") hit(k);
+    else if (map[k]) hit(map[k]);
+    else if (k === "Enter" || k === "=") hit("=");
+    else if (k === "Backspace") hit("back");
+    else if (k === "Escape" || k === "Delete") hit("AC");
+    else return;
+
+    e.preventDefault();
+  });
+
+  renderHistory();
+  update();
 })();
 </script>
 
